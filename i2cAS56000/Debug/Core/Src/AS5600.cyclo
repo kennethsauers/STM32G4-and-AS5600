@@ -1,0 +1,6 @@
+../Core/Src/AS5600.c:13:16:AS5600_ReadRegister	2
+../Core/Src/AS5600.c:30:17:AS5600_ReadTwoRegisters	1
+../Core/Src/AS5600.c:38:9:AS5600_ReadStatus	1
+../Core/Src/AS5600.c:43:10:AS5600_ReadRawAngle	1
+../Core/Src/AS5600.c:48:10:AS5600_ReadAngle	1
+../Core/Src/AS5600.c:53:6:DEBUG_ScanI2CBus	3

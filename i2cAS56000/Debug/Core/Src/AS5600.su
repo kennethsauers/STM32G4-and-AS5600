@@ -1,0 +1,6 @@
+../Core/Src/AS5600.c:13:16:AS5600_ReadRegister	40	static
+../Core/Src/AS5600.c:30:17:AS5600_ReadTwoRegisters	24	static
+../Core/Src/AS5600.c:38:9:AS5600_ReadStatus	8	static
+../Core/Src/AS5600.c:43:10:AS5600_ReadRawAngle	8	static
+../Core/Src/AS5600.c:48:10:AS5600_ReadAngle	8	static
+../Core/Src/AS5600.c:53:6:DEBUG_ScanI2CBus	16	static

@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "AS5600.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -100,89 +100,8 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  printf("Hello!\r\n");
-  printf("\r\n");
-
-   	printf("Scanning I2C bus:\r\n");
-  	HAL_StatusTypeDef result;
-   	uint8_t i;
-   	for (i=1; i<128; i++)
-   	{
-   	  /*
-   	   * the HAL wants a left aligned i2c address
-   	   * &hi2c1 is the handle
-   	   * (uint16_t)(i<<1) is the i2c address left aligned
-   	   * retries 2
-   	   * timeout 2
-   	   */
-   	  result = HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i<<1), 2, 2);
-   	  if (result != HAL_OK) // HAL_ERROR or HAL_BUSY or HAL_TIMEOUT
-   	  {
-   		  printf("."); // No ACK received at that address
-   	  }
-   	  if (result == HAL_OK)
-   	  {
-   		  printf("0x%X", i); // Received an ACK at that address
-   	  }
-   	}
-   	printf("\r\n");
+  //DEBUG_ScanI2CBus();
   /* USER CODE END 2 */
-
-
-#define AS5600_ADDRESS (0x36 << 1)  // 7-bit address shifted left for STM32 HAL (8-bit addressing)
-#define AS5600_REG_RAW_ANGLE_H 0x0C
-#define AS5600_REG_RAW_ANGLE_L 0x0D
-#define AS5600_REG_ANGLE_H     0x0E
-#define AS5600_REG_ANGLE_L     0x0F
-#define AS5600_REG_STATUS      0x0B
-
-// Add others as needed...
-
-
-
-
-uint8_t read_register(uint8_t Sensor_register)
-{
-	HAL_StatusTypeDef status;
-	uint8_t return_value = 0;
-
-	status = HAL_I2C_Mem_Read(&hi2c1,AS5600_ADDRESS ,Sensor_register, I2C_MEMADD_SIZE_8BIT, &return_value, 1, 100);
-	HAL_Delay(10);
-	/* Check the communication status */
-	if(status != HAL_OK)
-	{
-		printf("I2C read status error =%#x \n\r",status);
-				/*
-	HAL_ERROR    = 0x01U,
-	HAL_BUSY     = 0x02U,
-	HAL_TIMEOUT  = 0x03U
-				 */
-	}
-
-	return return_value;
-};
-
-void write_register(uint8_t Sensor_register, uint8_t register_value)
-{
-	HAL_StatusTypeDef status = HAL_OK;
-
-	status = HAL_I2C_Mem_Write(&hi2c1,AS5600_ADDRESS , Sensor_register, I2C_MEMADD_SIZE_8BIT, &register_value,1, 100);
-	HAL_Delay(10);
-	/* Check the communication status */
-	if(status != HAL_OK)
-	{
-		printf("I2C write status error =%#x \n\r",status);// Error handling, for example re-initialization of the I2C peripheral
-	}
-}
-
-uint16_t readTwo_register(uint8_t Sensor_register)
-{
-	  int highByte = read_register(Sensor_register );
-	  int lowByte  = read_register(Sensor_register+1);
-	  return ( highByte << 8 ) | lowByte;
-};
-
-#define AS5600_RESOLUTION 4096  // 12-bit resolution
 
 int angle = 0;
 int32_t multi_turn_angle = 0;    // final multi-turn angle in "steps"
@@ -198,8 +117,9 @@ int32_t totalAngle = 0;
 
 	//printf("RAW ANGLE   = 0x%04X\r\n", readTwo_register(AS5600_REG_RAW_ANGLE_H));
 	//HAL_Delay(100);
-
-	angle = readTwo_register(AS5600_REG_RAW_ANGLE_H);
+	int status = AS5600_ReadStatus();
+	printf("status: %d\r\n", status);
+	angle = AS5600_ReadAngle();
     int16_t delta = angle - previous_angle;
 
     // Handle wrap-around (crossing 0 or 4095)
